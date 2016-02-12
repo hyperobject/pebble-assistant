@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <title>App name here</title>
+  <link rel='stylesheet' type='text/css' href='css/slate.min.css'>
+  <script src='js/slate.min.js'></script>
+  <style>
+  .title {
+    padding: 15px 10px;
+    text-transform: uppercase;
+    font-family: 'PT Sans', sans-serif;
+    font-size: 1.2em;
+    font-weight: 500;
+    color: #888888;
+    text-align: center;
+  }
+  </style>
+  </head>
+
+  <body>
+    <h1 class='title'>Pebble Assistant Configuration</h1>
+
+    <div class="item-container">
+  <div class="item-container-header"></div>
+    <div class='item-container-content'>
+        <label class='item'>
+          Confirm query?
+          <input id='confirm' type='checkbox' class='item-toggle'>
+        </label>
+    </div>
+    <div class="item-container-footer">
+      Should the query be confirmed before getting an answer?
+    </div>
+</div>
+
+<div class="item-container">
+<div class="item-container-header"></div>
+<div class='item-container-content'>
+    <label class='item'>
+      Vibe on answer?
+      <input id='vibe' type='checkbox' class='item-toggle'>
+    </label>
+</div>
+<div class="item-container-footer">
+  Should your Pebble vibrate when it receives a response from Wolfram Alpha?
+</div>
+</div>
+
+<div class='item-container'>
+    <div class='button-container'>
+      <input id='submit_button' type='button' class='item-button' value='SUBMIT'>
+    </div>
+  </div>
+  <br />
+  <br />
+  </body>
+  <script>
+
+  function getConfigData() {
+    var confirm_box = document.getElementById('confirm');
+    var vibe_box = document.getElementById('vibe');
+
+    var options = {
+      'confirm': confirm_box.checked,
+      'vibe': vibe.checked
+    };
+
+    // Save for next launch
+    localStorage['confirm'] = options['confirm'];
+    localStorage['vibe'] = options['vibe'];
+
+    console.log('Got options: ' + JSON.stringify(options));
+    return options;
+  }
+
+  function getQueryParam(variable, defaultValue) {
+    var query = location.search.substring(1);
+    var vars = query.split('&');
+    for (var i = 0; i < vars.length; i++) {
+      var pair = vars[i].split('=');
+      if (pair[0] === variable) {
+        return decodeURIComponent(pair[1]);
+      }
+    }
+    return defaultValue || false;
+  }
+
+  var submitButton = document.getElementById('submit_button');
+  submitButton.addEventListener('click', function() {
+    console.log('Submit');
+
+    // Set the return URL depending on the runtime environment
+    var return_to = getQueryParam('return_to', 'pebblejs://close#');
+    document.location = return_to + encodeURIComponent(JSON.stringify(getConfigData()));
+  });
+
+  (function() {
+    var confirm_box = document.getElementById('confirm');
+    var vibe_box = document.getElementById('vibe');
+    // Load any previously saved configuration, if available
+    if(localStorage['confirm']) {
+      confirm_box.checked = (localStorage['confirm'] == "true");
+      vibe_box.checked = (localStorage['vibe'] == "true");
+    }
+  })();
+  </script>
+</html>
